@@ -202,6 +202,11 @@ export default function StudentsManagement() {
         <div>
           <p className="font-semibold text-surface-900 dark:text-white text-sm">{row.name}</p>
           <p className="text-[11px] text-surface-400">{row.email}</p>
+          {row.universityRollNo && (
+            <p className="text-[10px] font-medium text-primary-500 dark:text-primary-400 mt-0.5">
+              Roll No: {row.universityRollNo}
+            </p>
+          )}
         </div>
       </div>
     )},
@@ -285,6 +290,7 @@ export default function StudentsManagement() {
       <DataTable
         columns={columns}
         data={filteredStudents}
+        extraSearchKeys={['email', 'universityRollNo']}
         searchPlaceholder="Search students..."
         actions={(row) => (
           <>

@@ -10,6 +10,7 @@ export default function DataTable({
   onRowClick,
   actions,
   emptyMessage = 'No data found',
+  extraSearchKeys = [],
 }) {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,13 +18,22 @@ export default function DataTable({
 
   const filteredData = useMemo(() => {
     if (!search) return data;
-    return data.filter(row =>
-      columns.some(col => {
+    const lowerSearch = search.toLowerCase();
+    return data.filter(row => {
+      // Search visible columns
+      const inColumns = columns.some(col => {
         const value = col.accessor ? row[col.accessor] : '';
-        return String(value).toLowerCase().includes(search.toLowerCase());
-      })
-    );
-  }, [data, search, columns]);
+        return String(value).toLowerCase().includes(lowerSearch);
+      });
+      if (inColumns) return true;
+
+      // Search extra keys
+      return extraSearchKeys.some(key => {
+        const value = row[key];
+        return value && String(value).toLowerCase().includes(lowerSearch);
+      });
+    });
+  }, [data, search, columns, extraSearchKeys]);
 
   const sortedData = useMemo(() => {
     if (!sortConfig.key) return filteredData;
