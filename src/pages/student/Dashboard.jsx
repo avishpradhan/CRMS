@@ -9,7 +9,7 @@ export default function StudentDashboard() {
   const { user } = useSelector(state => state.auth);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [dashboardData, setDashboardData] = useState({
     applications: [],
     eligibleCount: 0,
@@ -157,51 +157,51 @@ export default function StudentDashboard() {
 
       {/* SECTION 1 — Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardCard 
-          title="Available Drives" 
-          value={eligibleCount} 
-          icon={Briefcase} 
-          color="accent" 
+        <DashboardCard
+          title="Available Drives"
+          value={eligibleCount}
+          icon={Briefcase}
+          color="accent"
         />
-        <DashboardCard 
-          title="Applications Submitted" 
-          value={totalApps} 
-          icon={FileText} 
-          color="primary" 
+        <DashboardCard
+          title="Applications Submitted"
+          value={totalApps}
+          icon={FileText}
+          color="primary"
         />
-        <DashboardCard 
-          title="Active Processes" 
-          value={activeApps.length} 
-          icon={TrendingUp} 
-          color="warning" 
+        <DashboardCard
+          title="Active Processes"
+          value={activeApps.length}
+          icon={TrendingUp}
+          color="warning"
         />
-        <DashboardCard 
-          title="Offers Received" 
-          value={offersCount} 
-          icon={Award} 
-          color="success" 
+        <DashboardCard
+          title="Offers Received"
+          value={offersCount}
+          icon={Award}
+          color="success"
         />
       </div>
 
       {/* Main Content Layout */}
       <div className="grid lg:grid-cols-3 gap-6">
-        
+
         {/* Left Side Columns */}
-        <div className="lg:col-span-2 space-y-6">
-          
+        <div className="lg:col-span-2 flex flex-col">
+
           {/* SECTION 2 — My Active Applications */}
-          <div className="glass-card p-5 space-y-4">
+          <div className="glass-card p-5 space-y-4 flex-1 flex flex-col">
             <h3 className="font-bold text-surface-900 dark:text-white">My Active Applications</h3>
             {activeApps.length === 0 ? (
-              <div className="text-center py-12 text-surface-400">
+              <div className="text-center py-12 text-surface-400 flex-1 flex flex-col justify-center">
                 <Briefcase size={36} className="mx-auto mb-2.5 opacity-30" />
                 <p className="text-sm font-medium">No active recruitment processes.</p>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 gap-4">
                 {activeApps.map(app => (
-                  <div 
-                    key={app.id} 
+                  <div
+                    key={app.id}
                     className="p-4 rounded-xl border border-surface-100 dark:border-surface-700/60 bg-surface-50 dark:bg-surface-800/30 flex flex-col justify-between gap-3"
                   >
                     <div>
@@ -230,98 +230,52 @@ export default function StudentDashboard() {
             )}
           </div>
 
-          {/* SECTION 3 — Recent Notifications */}
-          <div className="glass-card p-5 space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-bold text-surface-900 dark:text-white">Recent Notifications</h3>
-              <Link 
-                to="/student/notifications" 
-                className="text-xs font-bold text-primary-500 hover:text-primary-600 hover:underline"
-              >
-                View All Notifications
-              </Link>
-            </div>
-            {recentNotifs.length === 0 ? (
-              <div className="text-center py-10 text-surface-400">
-                <Bell size={36} className="mx-auto mb-2.5 opacity-30" />
-                <p className="text-sm font-medium">No recent notifications</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {recentNotifs.map(notif => (
-                  <div 
-                    key={notif._id} 
-                    className="p-3.5 rounded-xl border border-surface-100 dark:border-surface-800/60 bg-surface-50/50 dark:bg-surface-800/20 flex gap-3"
-                  >
-                    <div className="mt-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary-500 block shrink-0" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-surface-800 dark:text-surface-200">
-                        {notif.title}
-                      </p>
-                      <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
-                        {notif.message}
-                      </p>
-                      <p className="text-[10px] text-surface-400 mt-1">
-                        {new Date(notif.createdAt).toLocaleString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric', 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
         </div>
 
         {/* Right Side Column */}
-        <div className="space-y-6">
-          
+        <div className="flex flex-col">
+
           {/* SECTION 4 — Profile Completion */}
-          <div className="glass-card p-5 space-y-4">
-            <h3 className="font-bold text-surface-900 dark:text-white">Profile Completion</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-sm font-semibold">
-                <span className="text-surface-600 dark:text-surface-300">Completion Score</span>
-                <span className="text-primary-500">{completionPercentage}%</span>
-              </div>
-              <div className="w-full bg-surface-100 dark:bg-surface-700 h-2.5 rounded-full overflow-hidden">
-                <div 
-                  className="bg-primary-500 h-full rounded-full transition-all duration-500" 
-                  style={{ width: `${completionPercentage}%` }} 
-                />
+          <div className="glass-card p-5 flex-1 flex flex-col justify-between">
+            <div className="space-y-4">
+              <h3 className="font-bold text-surface-900 dark:text-white">Profile Completion</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm font-semibold">
+                  <span className="text-surface-600 dark:text-surface-300">Completion Score</span>
+                  <span className="text-primary-500">{completionPercentage}%</span>
+                </div>
+                <div className="w-full bg-surface-100 dark:bg-surface-700 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-primary-500 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${completionPercentage}%` }}
+                  />
+                </div>
               </div>
             </div>
-            
+
             {completionPercentage === 100 ? (
-              <div className="p-3 bg-success-50 dark:bg-success-950/20 text-success-600 dark:text-success-400 text-xs rounded-xl border border-success-100 dark:border-success-900/30 flex items-center gap-2">
+              <div className="p-3 bg-success-50 dark:bg-success-950/20 text-success-600 dark:text-success-400 text-xs rounded-xl border border-success-100 dark:border-success-900/30 flex items-center gap-2 mt-4">
                 <CheckCircle size={16} className="text-success-500 shrink-0" />
                 <span>100% Complete. Profile looks great.</span>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3 mt-4">
                 <p className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
                   Missing Fields:
                 </p>
                 <ul className="space-y-1">
                   {missingProfileFields.map(field => (
-                    <li 
-                      key={field} 
+                    <li
+                      key={field}
                       className="text-xs text-danger-500 dark:text-danger-400 flex items-center gap-1.5 font-medium"
                     >
-                      <span className="w-1 h-1 rounded-full bg-danger-500" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-danger-500" />
                       {field}
                     </li>
                   ))}
                 </ul>
-                <Link 
-                  to="/student/profile" 
+                <Link
+                  to="/student/profile"
                   className="text-xs font-bold text-primary-500 hover:text-primary-600 mt-2 block w-fit hover:underline"
                 >
                   Complete Profile &rarr;
@@ -330,6 +284,54 @@ export default function StudentDashboard() {
             )}
           </div>
 
+        </div>
+
+        {/* SECTION 3 — Recent Notifications */}
+        <div className="lg:col-span-3 glass-card p-5 space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="font-bold text-surface-900 dark:text-white">Recent Notifications</h3>
+            <Link
+              to="/student/notifications"
+              className="text-xs font-bold text-primary-500 hover:text-primary-600 hover:underline"
+            >
+              View All Notifications
+            </Link>
+          </div>
+          {recentNotifs.length === 0 ? (
+            <div className="text-center py-10 text-surface-400">
+              <Bell size={36} className="mx-auto mb-2.5 opacity-30" />
+              <p className="text-sm font-medium">No recent notifications</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recentNotifs.map(notif => (
+                <div
+                  key={notif._id}
+                  className="p-3.5 rounded-xl border border-surface-100 dark:border-surface-800/60 bg-surface-50/50 dark:bg-surface-800/20 flex gap-3"
+                >
+                  <div className="mt-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-500 block shrink-0" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-surface-800 dark:text-surface-200">
+                      {notif.title}
+                    </p>
+                    <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
+                      {notif.message}
+                    </p>
+                    <p className="text-[10px] text-surface-400 mt-1">
+                      {new Date(notif.createdAt).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>
