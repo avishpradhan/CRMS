@@ -13,6 +13,7 @@ const recruiterRoutes = require('./routes/recruiterRoutes');
 const adminApplicationRoutes = require('./routes/adminApplicationRoutes');
 const { studentRouter: eligibilityStudentRoutes, adminRouter: eligibilityAdminRoutes } = require('./routes/eligibilityRoutes');
 const adminBatchRoutes = require('./routes/adminBatchRoutes');
+const adminStatsRoutes = require('./routes/adminStatsRoutes');
 const { sendError } = require('./utils/response');
 
 const app = express();
@@ -60,6 +61,9 @@ app.use('/api/admin/students', adminStudentRoutes);
 
 // Admin – Batch management routes
 app.use('/api/admin/batches', adminBatchRoutes);
+
+// Admin – Statistics routes
+app.use('/api/admin/stats', adminStatsRoutes);
 
 // Eligibility Engine – Admin stats routes
 app.use('/api/admin/drives', eligibilityAdminRoutes);

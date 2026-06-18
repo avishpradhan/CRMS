@@ -133,10 +133,13 @@ export default function AdminDashboard() {
     });
 
     driveApps.forEach(a => {
-      if (a.currentStageId) {
-        const stageId = a.currentStageId._id || a.currentStageId;
-        if (stageCounts[stageId]) {
-          stageCounts[stageId].count += 1;
+      const status = a.pipelineStatus || a.status;
+      if (status !== 'Selected' && status !== 'Rejected') {
+        if (a.currentStageId) {
+          const stageId = a.currentStageId._id || a.currentStageId;
+          if (stageCounts[stageId]) {
+            stageCounts[stageId].count += 1;
+          }
         }
       }
     });
