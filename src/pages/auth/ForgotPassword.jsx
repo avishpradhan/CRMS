@@ -5,10 +5,35 @@ import { GraduationCap, Mail, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email) setSent(true);
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
+      setSent(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -21,6 +46,12 @@ export default function ForgotPassword() {
         </div>
 
         <div className="glass-card p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-danger-50 dark:bg-danger-500/10 text-danger-600 dark:text-danger-400 text-sm rounded-xl border border-red-200 dark:border-red-800">
+              {error}
+            </div>
+          )}
+
           {!sent ? (
             <>
               <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-1 text-center">Reset Password</h2>
@@ -39,11 +70,12 @@ export default function ForgotPassword() {
                       onChange={e => setEmail(e.target.value)}
                       placeholder="you@university.edu"
                       className="input-field pl-10"
+                      required
                     />
                   </div>
                 </div>
-                <button type="submit" className="btn-primary w-full py-3">
-                  Send Reset Link <ArrowRight size={16} />
+                <button type="submit" disabled={loading} className="btn-primary w-full py-3">
+                  {loading ? 'Sending...' : 'Send Reset Link'} <ArrowRight size={16} />
                 </button>
               </form>
             </>
@@ -54,9 +86,9 @@ export default function ForgotPassword() {
               </div>
               <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-2">Check your email</h2>
               <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                We've sent a password reset link to <strong className="text-surface-700 dark:text-surface-300">{email}</strong>
+                If an account exists for this email address, a password reset link has been sent.
               </p>
-              <button onClick={() => setSent(false)} className="btn-secondary">
+              <button onClick={() => { setSent(false); setError(''); }} className="btn-secondary">
                 Try another email
               </button>
             </div>

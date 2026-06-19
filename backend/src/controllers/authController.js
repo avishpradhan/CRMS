@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const { sendResponse, sendError } = require('../utils/response');
+const crypto = require('crypto');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
 /**
  * @desc    Register a new user
@@ -188,4 +190,105 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe };
+/**
+ * @desc    Forgot Password - Request reset link
+ * @route   POST /api/auth/forgot-password
+ * @access  Public
+ */
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return sendError(res, 400, 'Please provide an email address');
+    }
+
+    const user = await User.findOne({ email });
+
+    // Success response should be identical whether the user exists or not
+    const successMessage = 'If an account exists for this email address, a password reset link has been sent.';
+
+    if (!user) {
+      return sendResponse(res, 200, successMessage);
+    }
+
+    // Generate secure reset token using crypto
+    const rawToken = crypto.randomBytes(20).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    // Store token and expiration (1 hour)
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // Build reset URL
+    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${rawToken}`;
+
+    // Send email using Nodemailer with Brevo SMTP
+    try {
+      await sendPasswordResetEmail(user.email, user.fullName, resetUrl);
+    } catch (mailError) {
+      console.error('Failed to send reset email:', mailError.message);
+      // Clean up token if email fails
+      user.resetPasswordToken = null;
+      user.resetPasswordExpire = null;
+      await user.save();
+      return sendError(res, 500, 'Failed to send password reset email. Please try again later.');
+    }
+
+    return sendResponse(res, 200, successMessage);
+  } catch (error) {
+    console.error('ForgotPassword Error:', error);
+    return sendError(res, 500, 'Server error during forgot password process');
+  }
+};
+
+/**
+ * @desc    Reset Password
+ * @route   POST /api/auth/reset-password/:token
+ * @access  Public
+ */
+const resetPassword = async (req, res) => {
+  try {
+    const { password, confirmPassword } = req.body;
+
+    if (!password || !confirmPassword) {
+      return sendError(res, 400, 'Please provide both password and confirmPassword');
+    }
+
+    if (password !== confirmPassword) {
+      return sendError(res, 400, 'Passwords do not match');
+    }
+
+    if (password.length < 6) {
+      return sendError(res, 400, 'Password must be at least 6 characters');
+    }
+
+    // Hash token from URL param and lookup user
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return sendError(res, 400, 'Password reset token is invalid or has expired');
+    }
+
+    // Update password (will be hashed by User model's pre-save hook)
+    user.password = password;
+
+    // Clear reset token and expiration fields
+    user.resetPasswordToken = null;
+    user.resetPasswordExpire = null;
+    await user.save();
+
+    return sendResponse(res, 200, 'Password has been reset successfully');
+  } catch (error) {
+    console.error('ResetPassword Error:', error);
+    return sendError(res, 500, 'Server error during reset password process');
+  }
+};
+
+module.exports = { register, login, getMe, forgotPassword, resetPassword };

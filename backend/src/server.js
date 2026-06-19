@@ -35,6 +35,7 @@ const startServer = async () => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`API Health: http://localhost:${PORT}/api/health`);
+    console.log("EMAIL_FROM:", process.env.EMAIL_FROM);
   });
 };
 
